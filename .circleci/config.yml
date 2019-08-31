@@ -34,8 +34,30 @@ jobs:
           name: upload coverage data to codecov
           command: yarn codecov
 
+  linting:
+    executor: node-js-executor
+    steps:
+      - checkout
+
+      - restore_cache:
+          key: dependency-cache-{{ checksum "yarn.lock" }}
+
+      - run:
+          name: install dependencies
+          command: yarn
+
+      - save_cache:
+          key: dependency-cache-{{ checksum "yarn.lock" }}
+          paths:
+            - ./node_modules
+
+      - run:
+          name: lint
+          command: yarn lint
+
 workflows:
   version: 2
   front-plate-workflow:
     jobs:
       - testing
+      - linting
