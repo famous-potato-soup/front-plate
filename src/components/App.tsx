@@ -1,13 +1,13 @@
-import React from "react";
-import "./App.css";
+import React from 'react';
+import './App.css';
 
-import Login from "./OAuthLogin";
+import FacebookLogin from './OAuthLogin';
 
 const App: React.FC = () => {
   return (
     <div className="App">
       <header className="App-header">
-        <Login />
+        <FacebookLogin />
       </header>
     </div>
   );

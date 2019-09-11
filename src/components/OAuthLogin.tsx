@@ -1,13 +1,13 @@
-import React from "react";
+import React from 'react';
 
-import FacebookLogin from "react-facebook-login";
+import FacebookLogin from 'react-facebook-login';
 
 const fbKey: any = process.env.REACT_APP_FACEBOOK_KEY;
 
-function handleFacebookLogin(response: any): void {
-  // presenter에 props로 전달
+const handleFacebookLogin = (response: any): void => {
   console.log(response);
-}
+  // presenter에 props로 전달
+};
 
 const Login: React.FC = () => {
   return (
