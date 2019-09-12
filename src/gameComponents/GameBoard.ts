@@ -1,6 +1,10 @@
 import Phaser from 'phaser';
 
 const MARGIN_OF_MAP = 200;
+const MARGIN_OF_BORDER = 100;
+const VELOCITY_FACTOR = 0.35;
+const FRICTION_AIR = 0.1;
+const BOUND_RATE = 1;
 
 export interface GameBoardOptions {
   autoFocus: boolean;
@@ -47,6 +51,7 @@ class GameBoard {
         extend: {
           setWorldBoundsAndCamera: this.setWorldBoundsAndCamera,
           setBackgrounds: this.setBackgrounds,
+          drawBackgroundBorder: this.drawBackgroundBorder,
           setPlayer: this.setPlayer,
           addDragEventListener: this.addDragEventListener,
         },
@@ -56,7 +61,7 @@ class GameBoard {
 
   preloadGameAssets() {
     /**
-     * CAUTION: "this" doesnot mean GameBoard class.
+     * CAUTION: "this" does not mean GameBoard class.
      * This method is not binded to this class.
      */
     const scene: Phaser.Scene = (this as any) as Phaser.Scene;
@@ -66,23 +71,22 @@ class GameBoard {
 
   createGame() {
     /**
-     * CAUTION: "this" doesnot mean GameBoard class.
+     * CAUTION: "this" does not mean GameBoard class.
      * This method is not binded to this class.
      */
     const scene: Phaser.Scene = (this as any) as Phaser.Scene;
+
     this.setWorldBoundsAndCamera(scene);
 
     this.setBackgrounds(scene);
+    this.drawBackgroundBorder(scene);
     this.setPlayer(scene);
-
-    this.graphics = scene.add.graphics();
-    this.addDragEventListener(scene, this.graphics);
+    this.addDragEventListener(scene);
   }
 
   setWorldBoundsAndCamera(scene: Phaser.Scene) {
     scene.matter.world.setBounds();
-    // scene.cameras.main.setBounds(-512, -512, 1024, 1024);
-    scene.cameras.main.setZoom(1);
+    scene.cameras.main.setZoom(1.5);
   }
 
   setBackgrounds(scene: Phaser.Scene) {
@@ -95,38 +99,43 @@ class GameBoard {
         'background-tile',
       )
       .setOrigin(0);
+  }
 
+  drawBackgroundBorder(scene: Phaser.Scene) {
     const backgroundGraphics = scene.add.graphics();
+
     backgroundGraphics.lineStyle(5, 0xff0000, 1);
-    backgroundGraphics.moveTo(0, 0);
-    backgroundGraphics.lineTo(scene.scale.width, 0);
-    backgroundGraphics.lineTo(scene.scale.width, scene.scale.height);
-    backgroundGraphics.lineTo(0, scene.scale.height);
-    backgroundGraphics.lineTo(0, 0);
+    backgroundGraphics.moveTo(MARGIN_OF_BORDER, MARGIN_OF_BORDER);
+    backgroundGraphics.lineTo(scene.scale.width - MARGIN_OF_BORDER, MARGIN_OF_BORDER);
+    backgroundGraphics.lineTo(scene.scale.width - MARGIN_OF_BORDER, scene.scale.height - MARGIN_OF_BORDER);
+    backgroundGraphics.lineTo(MARGIN_OF_BORDER, scene.scale.height - MARGIN_OF_BORDER);
+    backgroundGraphics.lineTo(MARGIN_OF_BORDER, MARGIN_OF_BORDER);
     backgroundGraphics.stroke();
   }
 
   setPlayer(scene: Phaser.Scene): Phaser.Physics.Matter.Image {
     this.player = scene.matter.add.image(0, 0, 'player-black');
-    this.player.setBounce(1);
-    this.player.setFrictionAir(0.1);
+    this.player.setBounce(BOUND_RATE);
+    this.player.setFrictionAir(FRICTION_AIR);
     this.player.setIgnoreGravity(true);
     scene.cameras.main.startFollow(this.player, true);
 
     return this.player;
   }
 
-  addDragEventListener(scene: Phaser.Scene, graphics: Phaser.GameObjects.Graphics) {
+  addDragEventListener(scene: Phaser.Scene) {
     const draggingIndicator = new Phaser.Geom.Line();
+    const draggingGraphics = scene.add.graphics();
+
     scene.input.on('pointerdown', (pointer: Phaser.Input.Pointer) => {
-      graphics.clear();
-      graphics.lineStyle(1, 0xffffff, 1);
+      draggingGraphics.clear();
+      draggingGraphics.lineStyle(1, 0xffffff, 1);
 
       if (this.player) {
         draggingIndicator.setTo(this.player.x, this.player.y, pointer.worldX, pointer.worldY);
       }
 
-      graphics.strokeLineShape(draggingIndicator);
+      draggingGraphics.strokeLineShape(draggingIndicator);
     });
 
     scene.input.on('pointermove', (pointer: Phaser.Input.Pointer) => {
@@ -134,19 +143,19 @@ class GameBoard {
         draggingIndicator.x2 = pointer.worldX;
         draggingIndicator.y2 = pointer.worldY;
 
-        graphics.clear();
-        graphics.lineStyle(1, 0xffffff, 1);
-        graphics.strokeLineShape(draggingIndicator);
+        draggingGraphics.clear();
+        draggingGraphics.lineStyle(1, 0xffffff, 1);
+        draggingGraphics.strokeLineShape(draggingIndicator);
       }
     });
 
     scene.input.on('pointerup', (_: any, gameObject: Phaser.Physics.Arcade.Image) => {
-      graphics.clear();
+      draggingGraphics.clear();
       const velocityX = draggingIndicator.x1 - draggingIndicator.x2;
       const velocityY = draggingIndicator.y1 - draggingIndicator.y2;
 
       if (this.player) {
-        this.player.setVelocity(velocityX * 0.05, velocityY * 0.05);
+        this.player.setVelocity(velocityX * VELOCITY_FACTOR, velocityY * VELOCITY_FACTOR);
       }
     });
   }
