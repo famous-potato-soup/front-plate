@@ -12,7 +12,7 @@ class Board extends React.PureComponent<BoardProps> {
   constructor(props: BoardProps) {
     super(props);
 
-    this.gameBoard = new GameBoard(props);
+    this.gameBoard = new GameBoard({ width: 1000, height: 1000, ...props });
   }
 
   render() {

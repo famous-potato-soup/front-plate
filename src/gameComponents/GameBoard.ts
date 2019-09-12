@@ -1,20 +1,29 @@
 import Phaser from 'phaser';
 
+const MARGIN_OF_MAP = 200;
+
 export interface GameBoardOptions {
   autoFocus: boolean;
+
+  width: number;
+  height: number;
 }
 
 class GameBoard {
+  private options: GameBoardOptions;
+
   public game?: Phaser.Game;
   private graphics?: Phaser.GameObjects.Graphics;
   private player?: Phaser.Physics.Matter.Image;
 
   constructor(options: GameBoardOptions) {
-    this.setPhaserObjects(options);
+    this.options = options;
+
+    this.setPhaserObjects();
   }
 
-  setPhaserObjects(options: GameBoardOptions) {
-    const { autoFocus } = options;
+  setPhaserObjects() {
+    const { autoFocus, width, height } = this.options;
 
     // game 오브젝트는 딱히 바뀔일이 없고 이게 바뀐다고 re-render할 필요는 없으니까
     // 굳이 state로 쓰진 않는다.
@@ -22,6 +31,8 @@ class GameBoard {
       autoFocus,
       type: Phaser.AUTO,
       scale: {
+        width,
+        height,
         mode: Phaser.Scale.RESIZE,
         autoCenter: Phaser.Scale.CENTER_BOTH,
         expandParent: true,
@@ -60,6 +71,7 @@ class GameBoard {
      */
     const scene: Phaser.Scene = (this as any) as Phaser.Scene;
     this.setWorldBoundsAndCamera(scene);
+
     this.setBackgrounds(scene);
     this.setPlayer(scene);
 
@@ -74,7 +86,24 @@ class GameBoard {
   }
 
   setBackgrounds(scene: Phaser.Scene) {
-    scene.add.tileSprite(-512, -512, 2048, 2048, 'background-tile').setOrigin(0);
+    scene.add
+      .tileSprite(
+        -MARGIN_OF_MAP,
+        -MARGIN_OF_MAP,
+        scene.scale.width + MARGIN_OF_MAP * 2,
+        scene.scale.height + MARGIN_OF_MAP * 2,
+        'background-tile',
+      )
+      .setOrigin(0);
+
+    const backgroundGraphics = scene.add.graphics();
+    backgroundGraphics.lineStyle(5, 0xff0000, 1);
+    backgroundGraphics.moveTo(0, 0);
+    backgroundGraphics.lineTo(scene.scale.width, 0);
+    backgroundGraphics.lineTo(scene.scale.width, scene.scale.height);
+    backgroundGraphics.lineTo(0, scene.scale.height);
+    backgroundGraphics.lineTo(0, 0);
+    backgroundGraphics.stroke();
   }
 
   setPlayer(scene: Phaser.Scene): Phaser.Physics.Matter.Image {
@@ -96,6 +125,8 @@ class GameBoard {
       if (this.player) {
         draggingIndicator.setTo(this.player.x, this.player.y, pointer.worldX, pointer.worldY);
       }
+
+      graphics.strokeLineShape(draggingIndicator);
     });
 
     scene.input.on('pointermove', (pointer: Phaser.Input.Pointer) => {
