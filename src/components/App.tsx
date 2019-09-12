@@ -1,5 +1,6 @@
 import React from 'react';
 import './App.css';
+import { Board } from './board';
 
 import { withCookies, useCookies } from 'react-cookie';
 

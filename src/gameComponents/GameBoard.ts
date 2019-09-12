@@ -1,28 +1,20 @@
-import React from 'react';
-
 import Phaser from 'phaser';
 
-export interface GameBoardProps {
+export interface GameBoardOptions {
   autoFocus: boolean;
 }
 
-class GameBoard extends React.PureComponent<GameBoardProps> {
-  private game?: Phaser.Game;
+class GameBoard {
+  public game?: Phaser.Game;
   private graphics?: Phaser.GameObjects.Graphics;
   private player?: Phaser.Physics.Matter.Image;
 
-  constructor(props: GameBoardProps) {
-    super(props);
-
-    this.setPhaserObjects(props);
+  constructor(options: GameBoardOptions) {
+    this.setPhaserObjects(options);
   }
 
-  render() {
-    return <></>;
-  }
-
-  setPhaserObjects(props: GameBoardProps) {
-    const { autoFocus } = props;
+  setPhaserObjects(options: GameBoardOptions) {
+    const { autoFocus } = options;
 
     // game 오브젝트는 딱히 바뀔일이 없고 이게 바뀐다고 re-render할 필요는 없으니까
     // 굳이 state로 쓰진 않는다.
