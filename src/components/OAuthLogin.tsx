@@ -1,15 +1,16 @@
 import React from 'react';
 
+import { useCookies } from 'react-cookie';
+
 import FacebookLogin from 'react-facebook-login';
 
 const fbKey: any = process.env.REACT_APP_FACEBOOK_KEY;
 
-const handleFacebookLogin = (response: any): void => {
-  console.log(response);
-  // presenter에 props로 전달
-};
-
-const Login: React.FC = () => {
+const Login: React.SFC = () => {
+  const [cookie, setCookie] = useCookies(['user']);
+  const handleFacebookLogin = (response: any): void => {
+    setCookie('user', response);
+  };
   return (
     <FacebookLogin
       appId={fbKey} // facebook developer 페이지에 생성한 앱의 아이디
