@@ -1,15 +1,15 @@
-import React from "react";
+import React from 'react';
 
-import { useCookies } from "react-cookie";
+import { useCookies } from 'react-cookie';
 
-import FacebookLogin from "react-facebook-login";
+import FacebookLogin from 'react-facebook-login';
 
 const fbKey: any = process.env.REACT_APP_FACEBOOK_KEY;
 
 const Login: React.SFC = () => {
-  const [cookie, setCookie] = useCookies(["user"]);
+  const [cookie, setCookie] = useCookies(['user']);
   const handleFacebookLogin = (response: any): void => {
-    setCookie("user", response);
+    setCookie('user', response);
   };
   return (
     <FacebookLogin

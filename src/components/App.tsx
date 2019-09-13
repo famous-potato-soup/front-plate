@@ -1,23 +1,19 @@
-import React from "react";
-import "./App.css";
+import React from 'react';
+import './App.css';
 
-import { withCookies, useCookies } from "react-cookie";
+import { withCookies, useCookies } from 'react-cookie';
 
-import FacebookLogin from "./OAuthLogin";
+import FacebookLogin from './OAuthLogin';
 
 const App: React.FC = () => {
-  const [cookie, removeCookie] = useCookies(["user"]);
+  const [cookie, removeCookie] = useCookies(['user']);
   function removeUserCookie(): void {
-    removeCookie("user", "");
+    removeCookie('user', '');
   }
   return (
     <div className="App">
       <header className="App-header">
-        {cookie.user ? (
-          <button onClick={removeUserCookie}>로그아웃</button>
-        ) : (
-          <FacebookLogin />
-        )}
+        {cookie.user ? <button onClick={removeUserCookie}>로그아웃</button> : <FacebookLogin />}
       </header>
     </div>
   );
