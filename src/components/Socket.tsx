@@ -6,6 +6,8 @@ const { REACT_APP_API_URL } = process.env;
 // 1, socket 연결
 const Socket = socketio.connect(`${REACT_APP_API_URL}`);
 
+// const { Provider, Consumer } = React.createContext(defaultValue);
+
 const SocketClient: React.FC = () => {
   interface stonePush {
     stoneId: number;
@@ -63,7 +65,7 @@ const SocketClient: React.FC = () => {
   });
 
   // 추가 사항
-  //1. crushStone이나 deadStone을 클라이언트에서 처리할지 서버에서 처리할지에 대한 상의
+  //1. crushStone이나 deadStone을 클라이언트에서 처리할지 서버에서 처리할지에 대한 상의 => 따로 넘겨주는 방식. 위치 부딪힌 돌들., timestamp
   // 2. tsx말고 ts로 처리할 수 있을 듯 하다. App에 내려주기 위해서는 context를 쓰면 될까 (ts로 context 제길 ㅠ)
 
   return <div>Socket prototype</div>;
