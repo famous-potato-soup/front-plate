@@ -1,10 +1,10 @@
 import Phaser from 'phaser';
 
 const MARGIN_OF_MAP = 50;
-const MARGIN_OF_BORDER = 100;
+const MARGIN_OF_BORDER = 50;
 const VELOCITY_FACTOR = 0.35;
 const FRICTION_AIR = 0.1;
-const BOUND_RATE = 1;
+// const BOUND_RATE = 1;
 
 export interface GameBoardOptions {
   autoFocus: boolean;
@@ -85,6 +85,12 @@ class GameBoard {
     this.drawBackgroundBorder(scene);
     this.setPlayer(scene);
     this.addDragEventListener(scene);
+
+    scene.matter.world.on('collisionstart', (event: any) => {
+      if (event.pairs[0].bodyA.isStatic || event.pairs[0].bodyB.isStatic) {
+        console.log('Game Over');
+      }
+    });
   }
 
   setWorldBoundsAndCamera(scene: Phaser.Scene) {
@@ -107,7 +113,7 @@ class GameBoard {
   drawBackgroundBorder(scene: Phaser.Scene) {
     const backgroundGraphics = scene.add.graphics();
 
-    backgroundGraphics.lineStyle(5, 0xff0000, 1);
+    backgroundGraphics.lineStyle(10, 0x000000, 1);
     backgroundGraphics.moveTo(MARGIN_OF_BORDER, MARGIN_OF_BORDER);
     backgroundGraphics.lineTo(scene.scale.width - MARGIN_OF_BORDER, MARGIN_OF_BORDER);
     backgroundGraphics.lineTo(scene.scale.width - MARGIN_OF_BORDER, scene.scale.height - MARGIN_OF_BORDER);
@@ -118,7 +124,7 @@ class GameBoard {
 
   setPlayer(scene: Phaser.Scene): Phaser.Physics.Matter.Image {
     this.player = scene.matter.add.image(0, 0, 'player-black');
-    this.player.setBounce(BOUND_RATE);
+    // this.player.setBounce(BOUND_RATE);
     this.player.setFrictionAir(FRICTION_AIR);
     this.player.setIgnoreGravity(true);
     scene.cameras.main.startFollow(this.player, true);
