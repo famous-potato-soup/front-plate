@@ -4,7 +4,7 @@ const MARGIN_OF_MAP = 50;
 const MARGIN_OF_BORDER = 50;
 const VELOCITY_FACTOR = 0.35;
 const FRICTION_AIR = 0.1;
-// const BOUND_RATE = 1;
+const BOUND_RATE = 0.5;
 
 export interface GameBoardOptions {
   autoFocus: boolean;
@@ -57,6 +57,7 @@ class GameBoard {
           drawBackgroundBorder: this.drawBackgroundBorder,
           setPlayer: this.setPlayer,
           addDragEventListener: this.addDragEventListener,
+          createPlayer: this.createPlayer,
         },
       },
     });
@@ -123,13 +124,20 @@ class GameBoard {
   }
 
   setPlayer(scene: Phaser.Scene): Phaser.Physics.Matter.Image {
-    this.player = scene.matter.add.image(0, 0, 'player-black');
-    // this.player.setBounce(BOUND_RATE);
-    this.player.setFrictionAir(FRICTION_AIR);
-    this.player.setIgnoreGravity(true);
+    this.player = this.createPlayer(scene, 100, 100);
     scene.cameras.main.startFollow(this.player, true);
 
     return this.player;
+  }
+
+  createPlayer(scene: Phaser.Scene, x: number, y: number): Phaser.Physics.Matter.Image {
+    const player = scene.matter.add.image(x, y, 'player-black');
+    player.setCircle(player.width / 2, {});
+    player.setBounce(BOUND_RATE);
+    player.setFrictionAir(FRICTION_AIR);
+    player.setIgnoreGravity(true);
+
+    return player;
   }
 
   addDragEventListener(scene: Phaser.Scene) {
