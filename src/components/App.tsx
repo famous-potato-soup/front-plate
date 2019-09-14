@@ -1,22 +1,22 @@
-import React from "react";
-import "./App.css";
+import React from 'react';
+import './App.css';
 
-import { withCookies, useCookies } from "react-cookie";
+import { withCookies, useCookies } from 'react-cookie';
 
-import FacebookLogin from "./OAuthLogin";
-import SocketClient from "./Socket";
-import { Socket } from "./Socket";
+import FacebookLogin from './OAuthLogin';
+import SocketClient from './Socket';
+import { Socket } from './Socket';
 
-import thumb from "../assets/img-win.png";
+import thumb from '../assets/img-win.png';
 
 const App: React.FC = () => {
-  const [cookie, removeCookie] = useCookies(["user"]);
+  const [cookie, removeCookie] = useCookies(['user']);
   const removeUserCookie = () => {
-    removeCookie("user", "");
+    removeCookie('user', '');
   };
   SocketClient(cookie);
   const gameStart = () => {
-    Socket.emit("gameStart", cookie.user);
+    Socket.emit('gameStart', cookie.user);
   };
   return (
     <>
