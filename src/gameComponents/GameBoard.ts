@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 
-const MARGIN_OF_MAP = 200;
+const MARGIN_OF_MAP = 50;
 const MARGIN_OF_BORDER = 100;
 const VELOCITY_FACTOR = 0.35;
 const FRICTION_AIR = 0.1;
@@ -11,6 +11,8 @@ export interface GameBoardOptions {
 
   width: number;
   height: number;
+
+  parent?: string;
 }
 
 class GameBoard {
@@ -27,13 +29,14 @@ class GameBoard {
   }
 
   setPhaserObjects() {
-    const { autoFocus, width, height } = this.options;
+    const { autoFocus, width, height, parent } = this.options;
 
     // game 오브젝트는 딱히 바뀔일이 없고 이게 바뀐다고 re-render할 필요는 없으니까
     // 굳이 state로 쓰진 않는다.
     this.game = new Phaser.Game({
       autoFocus,
       type: Phaser.AUTO,
+      parent,
       scale: {
         width,
         height,

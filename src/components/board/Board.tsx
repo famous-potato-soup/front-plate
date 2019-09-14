@@ -2,21 +2,25 @@ import React from 'react';
 
 import { GameBoard } from '../../gameComponents';
 
-export interface BoardProps {
-  autoFocus: boolean;
-}
+import './Board.css';
+
+export interface BoardProps {}
 
 class Board extends React.PureComponent<BoardProps> {
-  private gameBoard: GameBoard;
+  private gameBoard?: GameBoard;
 
-  constructor(props: BoardProps) {
-    super(props);
-
-    this.gameBoard = new GameBoard({ width: 1000, height: 1000, ...props });
+  componentDidMount() {
+    this.gameBoard = new GameBoard({
+      autoFocus: true,
+      width: 1000,
+      height: 1000,
+      parent: 'phaser-parent',
+    });
   }
 
   render() {
-    return <></>;
+    // 어차피 한 페이지에 하나 마운트할 거니까 괜찮지 않을까...?
+    return <div id="phaser-parent"></div>;
   }
 }
 
