@@ -3,21 +3,55 @@ import './App.css';
 
 import { withCookies, useCookies } from 'react-cookie';
 
-import FacebookLogin from './OAuthLogin';
+import Login from './OAuthLogin';
 import SocketClient from './Socket';
-import { Socket } from './Socket';
+// import { Socket } from "./Socket";
 
-import thumb from '../assets/img-win.png';
+import socketio from 'socket.io-client';
+
+const { REACT_APP_API_URL } = process.env;
+const Socket = socketio.connect(`${REACT_APP_API_URL}`);
+
+// import thumb from "../assets/img-win.png";
+// import stone from "../assets/oval.png";
 
 const App: React.FC = () => {
   const [cookie, removeCookie] = useCookies(['user']);
   const removeUserCookie = () => {
     removeCookie('user', '');
   };
-  SocketClient(cookie);
+  if (cookie.user) {
+    SocketClient(cookie);
+  }
   const gameStart = () => {
     Socket.emit('gameStart', cookie.user);
   };
+
+  const userData = {
+    name: 'props.user.name',
+    email: 'props.user.email',
+    userID: 'props.user.id',
+    picture: 'props.user.picture.data.url',
+  };
+  Socket.emit('userLogin', userData);
+  Socket.on('gameStart', roomData => console.log(roomData));
+  Socket.on('shoot', data => console.log(data)); // 누가 쏴서 어디로 움직이는지 알기 위해서
+  Socket.on(
+    'moveEnd',
+    data => console.log(data),
+    // const moveEndData = {
+    //   tile,
+    //   player: [
+    //     stones: [],
+    //   ],
+    //   isGameFinished: boolean,
+    //   gameResult:{
+
+    //   }
+    // }
+  ); // 초를 막기 위해서 game끝나는 것 확인하기.
+  Socket.on('canShoot', data => console.log); // 중간에 악용하는 애들을 막기 위해서...
+
   return (
     <>
       <div className="App">
@@ -26,15 +60,13 @@ const App: React.FC = () => {
             <>
               <div className="info">
                 <div className="firstInfo info">
-                  <div className="stoneInfo info">
-                    <h2>stone info</h2>
-                  </div>
+                  <div className="stoneInfo info">{/* <img src={stone} alt="stone" /> */}</div>
                   <div className="myInfo info">
                     <div className="user-img">
                       <img src={cookie.user.picture.data.url} />
                     </div>
-                    <p>name: {cookie.user.name}</p>
-                    <p>email: {cookie.user.email}</p>
+                    <p className="user_name"> {cookie.user.name}</p>
+                    <p>{cookie.user.email}</p>
                   </div>
                 </div>
                 <div className="secondInfo">
@@ -55,12 +87,10 @@ const App: React.FC = () => {
               </div>
             </>
           ) : (
-            <FacebookLogin />
+            <Login />
           )}
         </div>
-        <div className="thumb_wrap">
-          <img src={thumb} alt="thumb_img" />
-        </div>
+        <div className="thumb_wrap">{/* <img src={thumb} alt="thumb_img" /> */}</div>
       </div>
     </>
   );

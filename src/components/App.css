@@ -56,7 +56,10 @@ body,
   border-radius: 22px;
   box-shadow: 2px 2px 1px 0 #ff3236, inset -3px -3px 1px 0 #59f7f6;
   border: solid 2px rgba(0, 0, 0, 0.48);
-  background-image: linear-gradient(to right, #fffffa, #ffffff 11%, #ffffff 94%, #fffffa);
+  background-image: url(../assets/img-gopan.png), linear-gradient(to right, #fffffa, #ffffff 11%, #ffffff 94%, #fffffa);
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .myInfo {
@@ -66,6 +69,11 @@ body,
   box-shadow: 2px 2px 1px 0 #ff3236, inset -3px -3px 1px 0 #59f7f6;
   border: solid 2px rgba(0, 0, 0, 0.48);
   background-image: linear-gradient(to right, #fffffa, #ffffff 11%, #ffffff 94%, #fffffa);
+}
+
+.user_name {
+  font-weight: bold;
+  font-size: 30px;
 }
 
 .rank {
@@ -81,8 +89,7 @@ body,
   margin: 15px;
 }
 
-.rank,
-.stoneInfo {
+.rank {
   display: flex;
   align-items: center;
   justify-content: center;
