@@ -2,17 +2,20 @@
   "name": "front-plate",
   "version": "0.1.0",
   "private": true,
+  "homepage": "https://battle-goround.core-a.org",
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "lint": "prettier --check \"src/**/*.{ts,tsx,css,scss}\" \"*.js\"",
-    "lint:fix": "prettier --write \"src/**/*.{ts,tsx,css,scss}\" \"*.js\""
+    "lint:fix": "prettier --write \"src/**/*.{ts,tsx,css,scss}\" \"*.js\"",
+    "deploy": "gh-pages -d build"
   },
   "dependencies": {
     "@types/socket.io": "^2.1.2",
     "@types/socket.io-client": "^1.4.32",
+    "gh-pages": "^2.1.1",
     "react": "^16.9.0",
     "react-dom": "^16.9.0",
     "react-redux": "^7.1.1",
