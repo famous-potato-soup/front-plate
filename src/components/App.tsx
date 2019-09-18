@@ -8,15 +8,14 @@ import SocketClient from './Socket';
 // import { Socket } from "./Socket";
 
 import socketio from 'socket.io-client';
+import thumb from '../assets/img-win.png';
+import stone from '../assets/oval.png';
 
 const { REACT_APP_API_URL } = process.env;
 const Socket = socketio.connect(`${REACT_APP_API_URL}`);
 
-// import thumb from "../assets/img-win.png";
-// import stone from "../assets/oval.png";
-
 const App: React.FC = () => {
-  const [cookie, removeCookie] = useCookies(['user']);
+  const [cookie, removeCookie, setCookie] = useCookies(['user']);
   const removeUserCookie = () => {
     removeCookie('user', '');
   };
@@ -60,7 +59,9 @@ const App: React.FC = () => {
             <>
               <div className="info">
                 <div className="firstInfo info">
-                  <div className="stoneInfo info">{/* <img src={stone} alt="stone" /> */}</div>
+                  <div className="stoneInfo info">
+                    <img src={stone} alt="stone" />
+                  </div>
                   <div className="myInfo info">
                     <div className="user-img">
                       <img src={cookie.user.picture.data.url} />
@@ -90,7 +91,9 @@ const App: React.FC = () => {
             <Login />
           )}
         </div>
-        <div className="thumb_wrap">{/* <img src={thumb} alt="thumb_img" /> */}</div>
+        <div className="thumb_wrap">
+          <img src={thumb} alt="thumb_img" />
+        </div>
       </div>
     </>
   );

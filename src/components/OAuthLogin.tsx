@@ -6,9 +6,14 @@ import FacebookLogin from 'react-facebook-login';
 
 const fbKey: any = process.env.REACT_APP_FACEBOOK_KEY;
 
-const Login: React.SFC = () => {
+const Login = () => {
   const [cookie, setCookie] = useCookies(['user']);
-  const handleFacebookLogin = (response: any): void => {
+  // const handleFacebookLogin = (response: any): void => {
+  //   setCookie('user', response);
+  // };
+  const handleFacebookLogin = response => {
+    // presenter에 props로 전달
+    console.log(response);
     setCookie('user', response);
   };
   return (
