@@ -6,14 +6,28 @@ import FacebookLogin from 'react-facebook-login';
 
 const fbKey: any = process.env.REACT_APP_FACEBOOK_KEY;
 
-const Login = () => {
+const LoginComponent = () => {
   const [cookie, setCookie] = useCookies(['user']);
-  // const handleFacebookLogin = (response: any): void => {
-  //   setCookie('user', response);
-  // };
-  const handleFacebookLogin = response => {
+  const handleFacebookLogin = (response: any): void => {
     // presenter에 props로 전달
     console.log(response);
+    const tokenBlob = new Blob([JSON.stringify({ access_token: response.accessToken }, null, 2)], {
+      type: 'application/json',
+    });
+    const options: Object = {
+      method: 'POST',
+      body: tokenBlob,
+      mode: 'cors',
+      cache: 'default',
+    };
+    fetch('http://localhost:4000/api/v1/auth/facebook', options).then(r => {
+      const token = r.headers.get('x-auth-token');
+      r.json().then(user => {
+        if (token) {
+          console.log(user, token);
+        }
+      });
+    });
     setCookie('user', response);
   };
   return (
@@ -27,4 +41,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default LoginComponent;

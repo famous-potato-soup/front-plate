@@ -8,6 +8,23 @@ const Socket = socketio.connect(`${REACT_APP_API_URL}`);
 // const { Provider, Consumer } = React.createContext(defaultValue);
 
 const SocketClient = props => {
+  Socket.on('gameStart', roomData => console.log(roomData));
+  Socket.on('shoot', data => console.log(data)); // 누가 쏴서 어디로 움직이는지 알기 위해서
+  Socket.on(
+    'moveEnd',
+    data => console.log(data),
+    // const moveEndData = {
+    //   tile,
+    //   player: [
+    //     stones: [],
+    //   ],
+    //   isGameFinished: boolean,
+    //   gameResult:{
+
+    //   }
+    // }
+  ); // 초를 막기 위해서 game끝나는 것 확인하기.
+  Socket.on('canShoot', data => console.log); // 중간에 악용하는 애들을 막기 위해서...
   interface stonePush {
     stoneId: number;
     actor: string;
@@ -148,5 +165,3 @@ const SocketClient = props => {
 };
 
 export default SocketClient;
-
-export { Socket };
