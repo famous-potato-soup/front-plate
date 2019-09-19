@@ -55,7 +55,7 @@ const LoginComponent = () => {
           render={renderProps => <button className="my-facebook-button-class" onClick={renderProps.onClick}></button>}
         />
       </div>
-      <div className="logoImg_wrap">
+      <div className="logoImg_wrap bottom">
         <img src={Stone} alt="stone" className="stone" />
       </div>
     </LoginComponents>
