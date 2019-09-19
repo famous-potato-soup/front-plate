@@ -20,6 +20,8 @@ export interface GameBoardOptions {
   height: number;
 
   parent?: string;
+
+  onDestroy: () => void;
 }
 
 class GameBoard {
@@ -39,7 +41,7 @@ class GameBoard {
   }
 
   setPhaserObjects() {
-    const { autoFocus, width, height, parent } = this.options;
+    const { autoFocus, width, height, parent, onDestroy } = this.options;
 
     // game 오브젝트는 딱히 바뀔일이 없고 이게 바뀐다고 re-render할 필요는 없으니까
     // 굳이 state로 쓰진 않는다.
@@ -69,6 +71,8 @@ class GameBoard {
           addDragEventListener: this.addDragEventListener,
           createPlayer: this.createPlayer,
           calculateWindowSize: this.calculateWindowSize,
+          game: this.game,
+          onDestroy,
         },
       },
     });
@@ -98,8 +102,13 @@ class GameBoard {
     this.addDragEventListener(scene);
 
     scene.matter.world.on('collisionstart', (event: any) => {
-      if (event.pairs[0].bodyA.isStatic || event.pairs[0].bodyB.isStatic) {
+      const eventBodies = event.pairs[0];
+      if (
+        (eventBodies.bodyA.isStatic || eventBodies.bodyB.isStatic) &&
+        (eventBodies.bodyA.label == 'My Player' || eventBodies.bodyB.label == 'My Player')
+      ) {
         console.log('Game Over');
+        (this as any).onDestroy();
       }
     });
   }
@@ -177,6 +186,7 @@ class GameBoard {
 
   setPlayer(scene: Phaser.Scene): Phaser.Physics.Matter.Image {
     this.player = this.createPlayer(scene, 100, 100);
+    (this.player.body as any).label = 'My Player';
     scene.cameras.main.startFollow(this.player, true);
 
     this.createPlayer(scene, 300, 300);

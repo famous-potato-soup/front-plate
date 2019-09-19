@@ -15,10 +15,22 @@ const App: React.FC = () => {
     setIsGaming(true);
   };
 
+  const handleDestroy = () => {
+    setIsGaming(false);
+  };
+
   return (
     <div className="App">
       <div className="content">
-        {cookie.user ? isGaming ? <Board /> : <ReadyComponent onGameStart={handleGameStart} /> : <LoginComponent />}
+        {cookie.user ? (
+          isGaming ? (
+            <Board onDestroy={handleDestroy} />
+          ) : (
+            <ReadyComponent onGameStart={handleGameStart} />
+          )
+        ) : (
+          <LoginComponent />
+        )}
       </div>
       {/* <WinComponent /> */}
     </div>
