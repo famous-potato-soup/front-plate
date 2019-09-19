@@ -1,9 +1,9 @@
 import socketio from 'socket.io-client';
 
-const { REACT_APP_API_URL } = process.env;
+const { REACT_APP_SOCKET_URL } = process.env;
 
 // 1, socket 연결
-const Socket = socketio.connect(`${REACT_APP_API_URL}`);
+const Socket = socketio.connect(`${REACT_APP_SOCKET_URL}`);
 
 // const { Provider, Consumer } = React.createContext(defaultValue);
 
