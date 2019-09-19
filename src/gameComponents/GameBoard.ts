@@ -109,6 +109,7 @@ class GameBoard {
         'background-tile',
       )
       .setOrigin(0);
+    scene.cameras.main.setBackgroundColor(0xffffff);
   }
 
   drawBackgroundBorder(scene: Phaser.Scene) {
