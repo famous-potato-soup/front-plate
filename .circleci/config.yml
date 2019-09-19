@@ -8,10 +8,6 @@ executors:
 
 jobs:
   linting:
-    branches:
-      only:
-        - master
-        - develop
     executor: node-js-executor
     steps:
       - checkout
@@ -31,33 +27,9 @@ jobs:
       - run:
           name: lint
           command: yarn lint
-  deploy:
-    branches:
-      only:
-        - master
-    executor: node-js-executor
-    steps:
-      - checkout
-
-      - restore_cache:
-          key: dependency-cache-{{ checksum "yarn.lock" }}
-
-      - run:
-          name: install dependencies
-          command: yarn
-
-      - save_cache:
-          key: dependency-cache-{{ checksum "yarn.lock" }}
-          paths:
-            - ./node_modules
-
-      - run:
-          name: deploy
-          command: yarn run deploy
 
 workflows:
   version: 2
   front-plate-workflow:
     jobs:
       - linting
-      - deploy
