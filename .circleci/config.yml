@@ -7,37 +7,6 @@ executors:
       - image: circleci/node:12.9.1
 
 jobs:
-  testing:
-    branches:
-      only:
-        - master
-        - develop
-    executor: node-js-executor
-    steps:
-      - checkout
-
-      - restore_cache:
-          key: dependency-cache-{{ checksum "yarn.lock" }}
-
-      - run:
-          name: install dependencies
-          command: |
-            yarn
-            yarn add codecov
-
-      - save_cache:
-          key: dependency-cache-{{ checksum "yarn.lock" }}
-          paths:
-            - ./node_modules
-
-      - run:
-          name: test
-          command: yarn test --coverage
-
-      - run:
-          name: upload coverage data to codecov
-          command: yarn codecov
-
   linting:
     branches:
       only:
@@ -86,11 +55,9 @@ jobs:
           name: deploy
           command: yarn run deploy
 
-
 workflows:
   version: 2
   front-plate-workflow:
     jobs:
-      - testing
       - linting
       - deploy
