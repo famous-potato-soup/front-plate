@@ -11,14 +11,24 @@
   margin-top: 5%;
 }
 
+.logoImg_wrap.bottom {
+  position: fixed;
+  bottom: 0;
+  margin: 0;
+}
+
+.logoImg_wrap.bottom img {
+  width: 50%;
+}
+
 .logoImg {
   width: 56%;
 }
 
 .stone {
-  width: 56%;
+  /* width: 56%;
   position: fixed;
-  z-index: 1;
+  z-index: 1; */
   /* bottom: 0; */
 }
 

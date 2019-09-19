@@ -18,18 +18,27 @@ const Info = styled.div`
   z-index: 3;
 `;
 
-const ReadyComponent: React.FC = () => {
-  const [cookie, removeCookie, setCookie] = useCookies(['user']);
+export interface ReadyComponentProps {
+  onGameStart: () => void;
+}
+
+const ReadyComponent: React.FC<ReadyComponentProps> = ({ onGameStart }) => {
+  const [cookie, removeCookie] = useCookies(['user']);
   const removeUserCookie = () => {
     removeCookie('user', '');
   };
   if (cookie.user) {
     SocketClient(cookie);
   }
+
+  const handleGameStart = () => {
+    onGameStart();
+  };
+
   return (
     <div className="Info_wrap">
       <Info>
-        <div className="firstInfo">
+        <div className="infoContent firstInfo">
           <div className="stoneInfo info">
             <img src={stone} alt="stone" />
           </div>
@@ -41,12 +50,12 @@ const ReadyComponent: React.FC = () => {
             <p>{cookie.user.email}</p>
           </div>
         </div>
-        <div className="secondInfo">
+        <div className="infoContent secondInfo">
           <div className="rank info">
             <h2>rank</h2>
           </div>
           <div className="start_wrap info">
-            <button className="GameStart-btn">
+            <button className="GameStart-btn" onClick={handleGameStart}>
               <p>Game Start</p>
             </button>
           </div>

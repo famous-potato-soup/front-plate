@@ -12,8 +12,8 @@ class Board extends React.PureComponent<BoardProps> {
   componentDidMount() {
     this.gameBoard = new GameBoard({
       autoFocus: true,
-      width: 1000,
-      height: 1000,
+      width: 1500,
+      height: 1500,
       parent: 'phaser-parent',
     });
   }

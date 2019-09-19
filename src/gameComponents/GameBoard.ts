@@ -1,10 +1,13 @@
 import Phaser from 'phaser';
 
-const MARGIN_OF_MAP = 50;
-const MARGIN_OF_BORDER = 50;
-const VELOCITY_FACTOR = 0.35;
-const FRICTION_AIR = 0.1;
-const BOUND_RATE = 0.5;
+const MARGIN_OF_MAP = 0;
+const MARGIN_OF_BORDER = 0;
+const ZOOME_LEVEL_OF_CAMERA = 1.85;
+const VELOCITY_FACTOR = 0.15;
+const FRICTION_AIR = 0.08;
+const BOUND_RATE = 2;
+
+const DRAG_LINE_COLOR = 0x000000;
 
 export interface GameBoardOptions {
   autoFocus: boolean;
@@ -40,7 +43,7 @@ class GameBoard {
       scale: {
         width,
         height,
-        mode: Phaser.Scale.RESIZE,
+        mode: Phaser.Scale.ENVELOP,
         autoCenter: Phaser.Scale.CENTER_BOTH,
         expandParent: true,
       },
@@ -96,7 +99,7 @@ class GameBoard {
 
   setWorldBoundsAndCamera(scene: Phaser.Scene) {
     scene.matter.world.setBounds();
-    scene.cameras.main.setZoom(1.5);
+    scene.cameras.main.setZoom(ZOOME_LEVEL_OF_CAMERA);
   }
 
   setBackgrounds(scene: Phaser.Scene) {
@@ -109,6 +112,7 @@ class GameBoard {
         'background-tile',
       )
       .setOrigin(0);
+    scene.cameras.main.setBackgroundColor(0xffffff);
   }
 
   drawBackgroundBorder(scene: Phaser.Scene) {
@@ -146,7 +150,7 @@ class GameBoard {
 
     scene.input.on('pointerdown', (pointer: Phaser.Input.Pointer) => {
       draggingGraphics.clear();
-      draggingGraphics.lineStyle(1, 0xffffff, 1);
+      draggingGraphics.lineStyle(1, DRAG_LINE_COLOR, 1);
 
       if (this.player) {
         draggingIndicator.setTo(this.player.x, this.player.y, pointer.worldX, pointer.worldY);
@@ -161,7 +165,7 @@ class GameBoard {
         draggingIndicator.y2 = pointer.worldY;
 
         draggingGraphics.clear();
-        draggingGraphics.lineStyle(1, 0xffffff, 1);
+        draggingGraphics.lineStyle(1, DRAG_LINE_COLOR, 1);
         draggingGraphics.strokeLineShape(draggingIndicator);
       }
     });
