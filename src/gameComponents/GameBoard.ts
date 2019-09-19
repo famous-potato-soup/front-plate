@@ -4,11 +4,11 @@ import Phaser from 'phaser';
 const MARGIN_OF_MAP = 0;
 const MARGIN_OF_BORDER = 0;
 const ZOOME_LEVEL_OF_CAMERA = 1.85;
-const VELOCITY_FACTOR = 0.15;
-const FRICTION_AIR = 0.08;
-const BOUND_RATE = 2;
+const VELOCITY_FACTOR = 0.25;
+const FRICTION_AIR = 0.03;
+const BOUND_RATE = 1;
 
-const DRAG_LINE_COLOR = 0x000000;
+const DRAG_LINE_COLOR = 0x666666;
 
 const MINIMAP_MARGIN = 50;
 const MINIMAP_SIZE = 300;
@@ -33,6 +33,8 @@ class GameBoard {
 
   private minimap?: Phaser.Cameras.Scene2D.Camera;
   private isDragging: boolean = false;
+
+  private otherPlayers: Phaser.Physics.Matter.Image[] = [];
 
   constructor(options: GameBoardOptions) {
     this.options = options;
@@ -73,6 +75,7 @@ class GameBoard {
           calculateWindowSize: this.calculateWindowSize,
           game: this.game,
           onDestroy,
+          otherPlayers: [],
         },
       },
     });
@@ -86,6 +89,7 @@ class GameBoard {
     const scene: Phaser.Scene = (this as any) as Phaser.Scene;
     scene.load.image('background-tile', '/static/in-game/background.png');
     scene.load.image('player-black', '/static/in-game/player.png');
+    scene.load.image('dragging-arrow', '/static/in-game/arrow.png');
   }
 
   createGame() {
@@ -103,12 +107,22 @@ class GameBoard {
 
     scene.matter.world.on('collisionstart', (event: any) => {
       const eventBodies = event.pairs[0];
-      if (
-        (eventBodies.bodyA.isStatic || eventBodies.bodyB.isStatic) &&
-        (eventBodies.bodyA.label == 'My Player' || eventBodies.bodyB.label == 'My Player')
-      ) {
-        console.log('Game Over');
-        (this as any).onDestroy();
+      if (eventBodies.bodyA.isStatic || eventBodies.bodyB.isStatic) {
+        if (eventBodies.bodyA.label == 'My Player' || eventBodies.bodyB.label == 'My Player') {
+          console.log('Game Over');
+          // if (this.player) this.player.destroy(true);
+          // (this as any).onDestroy(true);
+        } else {
+          if (eventBodies.bodyA.label.startsWith('player')) {
+            const otherPlayer = this.otherPlayers[parseInt(eventBodies.bodyA.label.replace('player ', ''), 10)];
+            otherPlayer.setVisible(false);
+            eventBodies.bodyA.destroy(true);
+          } else {
+            const otherPlayer = this.otherPlayers[parseInt(eventBodies.bodyB.label.replace('player ', ''), 10)];
+            otherPlayer.setVisible(false);
+            eventBodies.bodyB.destroy(true);
+          }
+        }
       }
     });
   }
@@ -168,14 +182,15 @@ class GameBoard {
         scene.scale.height + MARGIN_OF_MAP * 2,
         'background-tile',
       )
-      .setOrigin(0);
+      .setOrigin(0)
+      .setAlpha(0.2);
     scene.cameras.main.setBackgroundColor(0xffffff);
   }
 
   drawBackgroundBorder(scene: Phaser.Scene) {
     const backgroundGraphics = scene.add.graphics();
 
-    backgroundGraphics.lineStyle(10, 0x000000, 1);
+    backgroundGraphics.lineStyle(10, 0xcccccc, 1);
     backgroundGraphics.moveTo(MARGIN_OF_BORDER, MARGIN_OF_BORDER);
     backgroundGraphics.lineTo(scene.scale.width - MARGIN_OF_BORDER, MARGIN_OF_BORDER);
     backgroundGraphics.lineTo(scene.scale.width - MARGIN_OF_BORDER, scene.scale.height - MARGIN_OF_BORDER);
@@ -189,7 +204,19 @@ class GameBoard {
     (this.player.body as any).label = 'My Player';
     scene.cameras.main.startFollow(this.player, true);
 
-    this.createPlayer(scene, 300, 300);
+    for (let i = 0; i < 100; i++) {
+      const p = this.createPlayer(scene, 100, 100);
+      p.setRandomPosition();
+      (p.body as any).label = `player ${i}`;
+      this.otherPlayers.push(p);
+    }
+
+    setInterval(() => {
+      for (let i = 0; i < 3; i++) {
+        const index = Math.floor(Math.random() * this.otherPlayers.length);
+        this.otherPlayers[index].setVelocity((Math.random() - 0.5) * 100, (Math.random() - 0.5) * 100);
+      }
+    }, 100);
 
     return this.player;
   }
@@ -223,6 +250,13 @@ class GameBoard {
 
         draggingIndicator.setTo(this.player.x, this.player.y, pointer.worldX, pointer.worldY);
         draggingGraphics.strokeLineShape(draggingIndicator);
+
+        draggingGraphics.strokeCircle(
+          this.player.x,
+          this.player.y,
+          (Math.sqrt(Math.pow(this.player.x - pointer.worldX, 2) + Math.pow(this.player.y - pointer.worldY, 2)) * 3) /
+            5,
+        );
       }
     });
 
@@ -233,6 +267,12 @@ class GameBoard {
         draggingGraphics.clear();
         draggingGraphics.lineStyle(1, DRAG_LINE_COLOR, 1);
         draggingGraphics.strokeLineShape(draggingIndicator);
+        draggingGraphics.strokeCircle(
+          this.player.x,
+          this.player.y,
+          (Math.sqrt(Math.pow(this.player.x - pointer.worldX, 2) + Math.pow(this.player.y - pointer.worldY, 2)) * 3) /
+            5,
+        );
       }
     });
 
