@@ -4,9 +4,24 @@ import Phaser from 'phaser';
 const MARGIN_OF_MAP = 0;
 const MARGIN_OF_BORDER = 0;
 const ZOOME_LEVEL_OF_CAMERA = 1.85;
-const VELOCITY_FACTOR = 0.25;
-const FRICTION_AIR = 0.03;
-const BOUND_RATE = 1;
+
+// 정상
+const VELOCITY_FACTOR = 0.2;
+const FRICTION_AIR = 0.06;
+const FRICTION = 0.05;
+const BOUND_RATE = 1.25;
+
+// true 오일
+// const VELOCITY_FACTOR = 0.20;
+// const FRICTION_AIR = 0.03;
+// const FRICTION = 0.03;
+// const BOUND_RATE = 1;
+
+// 무중력
+// const VELOCITY_FACTOR = 0.08;
+// const FRICTION_AIR = 0.0;
+// const FRICTION = 0.0;
+// const BOUND_RATE = 1;
 
 const DRAG_LINE_COLOR = 0x666666;
 
@@ -204,19 +219,19 @@ class GameBoard {
     (this.player.body as any).label = 'My Player';
     scene.cameras.main.startFollow(this.player, true);
 
-    for (let i = 0; i < 100; i++) {
+    for (let i = 0; i < 10; i++) {
       const p = this.createPlayer(scene, 100, 100);
       p.setRandomPosition();
       (p.body as any).label = `player ${i}`;
       this.otherPlayers.push(p);
     }
 
-    setInterval(() => {
-      for (let i = 0; i < 3; i++) {
-        const index = Math.floor(Math.random() * this.otherPlayers.length);
-        this.otherPlayers[index].setVelocity((Math.random() - 0.5) * 100, (Math.random() - 0.5) * 100);
-      }
-    }, 100);
+    // setInterval(() => {
+    //   for (let i = 0; i < 3; i++) {
+    //     const index = Math.floor(Math.random() * this.otherPlayers.length);
+    //     this.otherPlayers[index].setVelocity((Math.random() - 0.5) * 100, (Math.random() - 0.5) * 100);
+    //   }
+    // }, 100);
 
     return this.player;
   }
@@ -226,6 +241,7 @@ class GameBoard {
     player.setCircle(player.width / 2, {});
     player.setBounce(BOUND_RATE);
     player.setFrictionAir(FRICTION_AIR);
+    player.setFriction(FRICTION);
     player.setIgnoreGravity(true);
 
     return player;
