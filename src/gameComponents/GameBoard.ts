@@ -30,6 +30,7 @@ class GameBoard {
   private player?: Phaser.Physics.Matter.Image;
 
   private minimap?: Phaser.Cameras.Scene2D.Camera;
+  private isDragging: boolean = false;
 
   constructor(options: GameBoardOptions) {
     this.options = options;
@@ -196,22 +197,28 @@ class GameBoard {
   addDragEventListener(scene: Phaser.Scene) {
     const draggingIndicator = new Phaser.Geom.Line();
     const draggingGraphics = scene.add.graphics();
+    this.isDragging = false;
 
     scene.input.on('pointerdown', (pointer: Phaser.Input.Pointer) => {
-      draggingGraphics.clear();
-      draggingGraphics.lineStyle(1, DRAG_LINE_COLOR, 1);
+      if (
+        this.player &&
+        pointer.worldX > this.player.x - 25 &&
+        pointer.worldX < this.player.x + 25 &&
+        pointer.worldY > this.player.y - 25 &&
+        pointer.worldY < this.player.y + 25
+      ) {
+        this.isDragging = true;
+        draggingGraphics.clear();
+        draggingGraphics.lineStyle(1, DRAG_LINE_COLOR, 1);
 
-      if (this.player) {
         draggingIndicator.setTo(this.player.x, this.player.y, pointer.worldX, pointer.worldY);
+        draggingGraphics.strokeLineShape(draggingIndicator);
       }
-
-      draggingGraphics.strokeLineShape(draggingIndicator);
     });
 
     scene.input.on('pointermove', (pointer: Phaser.Input.Pointer) => {
-      if (pointer.isDown) {
-        draggingIndicator.x2 = pointer.worldX;
-        draggingIndicator.y2 = pointer.worldY;
+      if (pointer.isDown && this.isDragging && this.player) {
+        draggingIndicator.setTo(this.player.x, this.player.y, pointer.worldX, pointer.worldY);
 
         draggingGraphics.clear();
         draggingGraphics.lineStyle(1, DRAG_LINE_COLOR, 1);
@@ -220,11 +227,12 @@ class GameBoard {
     });
 
     scene.input.on('pointerup', (_: any, gameObject: Phaser.Physics.Arcade.Image) => {
-      draggingGraphics.clear();
-      const velocityX = draggingIndicator.x1 - draggingIndicator.x2;
-      const velocityY = draggingIndicator.y1 - draggingIndicator.y2;
+      if (this.player && this.isDragging) {
+        this.isDragging = false;
+        draggingGraphics.clear();
+        const velocityX = draggingIndicator.x1 - draggingIndicator.x2;
+        const velocityY = draggingIndicator.y1 - draggingIndicator.y2;
 
-      if (this.player) {
         this.player.setVelocity(velocityX * VELOCITY_FACTOR, velocityY * VELOCITY_FACTOR);
       }
     });
