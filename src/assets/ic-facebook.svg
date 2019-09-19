@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="584" height="88" viewBox="0 0 584 88">
+    <defs>
+        <radialGradient id="c" cx="95.252%" cy="26.664%" r="97.681%" fx="95.252%" fy="26.664%" gradientTransform="matrix(-.02123 .98825 -.4779 -.53213 1.1 -.533)">
+            <stop offset="0%" stop-color="#FFF"/>
+            <stop offset="0%" stop-color="#F6F6F6" stop-opacity=".56"/>
+            <stop offset="100%" stop-color="#FFF" stop-opacity="0"/>
+        </radialGradient>
+        <rect id="a" width="576" height="80" rx="40"/>
+        <filter id="b" width="102.8%" x="-.7%" y="-5%" filterUnits="objectBoundingBox">
+            <feOffset dx="5" dy="5" in="SourceAlpha" result="shadowOffsetOuter1"/>
+            <feGaussianBlur in="shadowOffsetOuter1" result="shadowBlurOuter1" stdDeviation="1.5"/>
+            <feColorMatrix in="shadowBlurOuter1" values="0 0 0 0 0.258823529 0 0 0 0 0.403921569 0 0 0 0 0.698039216 0 0 0 1 0"/>
+        </filter>
+    </defs>
+    <g fill="none" fill-rule="evenodd">
+        <mask id="d" fill="#fff">
+            <use xlink:href="#a"/>
+        </mask>
+        <use fill="#000" filter="url(#b)" xlink:href="#a"/>
+        <use fill="#4267B2" xlink:href="#a"/>
+        <use fill="url(#c)" xlink:href="#a"/>
+        <path fill="#FFF" fill-rule="nonzero" d="M94.2 14.4v16.02h-8.04c-2.774 0-4.02 3.244-4.02 6.008V46.44H94.2v16.02H82.14V94.5H66.06V62.46H54V46.44h12.06V30.42c0-8.848 7.2-16.02 16.08-16.02H94.2z" mask="url(#d)"/>
+        <text fill="#FFF" font-family="PressStart2P-Regular, Press Start 2P" font-size="24" mask="url(#d)">
+            <tspan x="180" y="55">Let’s Begin</tspan>
+        </text>
+    </g>
+</svg>

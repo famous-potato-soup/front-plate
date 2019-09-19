@@ -3,18 +3,16 @@ import './App.css';
 
 import { withCookies, useCookies } from 'react-cookie';
 
-import FacebookLogin from './OAuthLogin';
+import LoginComponent from './tsx/OAuthLogin';
+import ReadyComponent from './tsx/ReadyComponent';
+import { WinComponent, LoseComponent } from './tsx/Result';
 
 const App: React.FC = () => {
-  const [cookie, removeCookie] = useCookies(['user']);
-  function removeUserCookie(): void {
-    removeCookie('user', '');
-  }
+  const [cookie] = useCookies(['user']);
   return (
     <div className="App">
-      <header className="App-header">
-        {cookie.user ? <button onClick={removeUserCookie}>로그아웃</button> : <FacebookLogin />}
-      </header>
+      <div className="content">{cookie.user ? <ReadyComponent /> : <LoginComponent />}</div>
+      {/* <WinComponent /> */}
     </div>
   );
 };
