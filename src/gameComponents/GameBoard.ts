@@ -25,6 +25,8 @@ class GameBoard {
   private graphics?: Phaser.GameObjects.Graphics;
   private player?: Phaser.Physics.Matter.Image;
 
+  private minimap?: Phaser.Cameras.Scene2D.Camera;
+
   constructor(options: GameBoardOptions) {
     this.options = options;
 
@@ -84,7 +86,6 @@ class GameBoard {
     const scene: Phaser.Scene = (this as any) as Phaser.Scene;
 
     this.setWorldBoundsAndCamera(scene);
-
     this.setBackgrounds(scene);
     this.drawBackgroundBorder(scene);
     this.setPlayer(scene);
@@ -100,6 +101,13 @@ class GameBoard {
   setWorldBoundsAndCamera(scene: Phaser.Scene) {
     scene.matter.world.setBounds();
     scene.cameras.main.setZoom(ZOOME_LEVEL_OF_CAMERA);
+
+    console.log(scene.scale.canvas.scrollHeight);
+
+    this.minimap = scene.cameras.add(scene.scale.width - 400, scene.scale.height - 700, 300, 300);
+    this.minimap.setZoom(0.2).setName('mini');
+    this.minimap.setBounds(0, 0, 1000, 1000);
+    this.minimap.setBackgroundColor(0xffffff);
   }
 
   setBackgrounds(scene: Phaser.Scene) {
