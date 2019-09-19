@@ -1,3 +1,4 @@
+// TODO game 오브젝트 destory할 때 window.onresize도 같이 해제해주세요!
 import Phaser from 'phaser';
 
 const MARGIN_OF_MAP = 0;
@@ -8,6 +9,9 @@ const FRICTION_AIR = 0.08;
 const BOUND_RATE = 2;
 
 const DRAG_LINE_COLOR = 0x000000;
+
+const MINIMAP_MARGIN = 50;
+const MINIMAP_SIZE = 300;
 
 export interface GameBoardOptions {
   autoFocus: boolean;
@@ -63,6 +67,7 @@ class GameBoard {
           setPlayer: this.setPlayer,
           addDragEventListener: this.addDragEventListener,
           createPlayer: this.createPlayer,
+          calculateWindowSize: this.calculateWindowSize,
         },
       },
     });
@@ -102,12 +107,46 @@ class GameBoard {
     scene.matter.world.setBounds();
     scene.cameras.main.setZoom(ZOOME_LEVEL_OF_CAMERA);
 
-    console.log(scene.scale.canvas.scrollHeight);
-
-    this.minimap = scene.cameras.add(scene.scale.width - 400, scene.scale.height - 700, 300, 300);
+    this.minimap = scene.cameras.add(0, 0, MINIMAP_SIZE, MINIMAP_SIZE);
     this.minimap.setZoom(0.2).setName('mini');
     this.minimap.setBounds(0, 0, 1000, 1000);
     this.minimap.setBackgroundColor(0xffffff);
+
+    this.calculateWindowSize(scene);
+  }
+
+  calculateWindowSize(scene: Phaser.Scene) {
+    const actualWidth = window.innerWidth;
+    const actualHeight = window.innerHeight;
+
+    const canvasWidth = scene.scale.canvas.width;
+    const canvasHeight = scene.scale.canvas.height;
+
+    const canvasRatio = canvasWidth / canvasHeight;
+    const windowRatio = actualWidth / actualHeight;
+
+    if (this.minimap) {
+      if (windowRatio > canvasRatio) {
+        // 실제 캔버스 비율보다 윈도우 비율이 폭이 길 때
+        // 그럼 높이를 신경써야 함
+        const visibleCanvasHeight = canvasWidth / windowRatio;
+        this.minimap.setPosition(
+          canvasWidth - MINIMAP_SIZE - MINIMAP_MARGIN,
+          canvasHeight - MINIMAP_SIZE - MINIMAP_MARGIN - (canvasHeight - visibleCanvasHeight) / 2,
+        );
+      } else if (windowRatio < canvasRatio) {
+        const visibleCanvasWidth = canvasHeight * windowRatio;
+        this.minimap.setPosition(
+          canvasWidth - MINIMAP_SIZE - MINIMAP_MARGIN - (canvasWidth - visibleCanvasWidth) / 2,
+          canvasHeight - MINIMAP_SIZE - MINIMAP_MARGIN,
+        );
+      } else {
+        this.minimap.setPosition(
+          canvasWidth - MINIMAP_SIZE - MINIMAP_MARGIN,
+          canvasHeight - MINIMAP_SIZE - MINIMAP_MARGIN,
+        );
+      }
+    }
   }
 
   setBackgrounds(scene: Phaser.Scene) {
@@ -138,6 +177,8 @@ class GameBoard {
   setPlayer(scene: Phaser.Scene): Phaser.Physics.Matter.Image {
     this.player = this.createPlayer(scene, 100, 100);
     scene.cameras.main.startFollow(this.player, true);
+
+    this.createPlayer(scene, 300, 300);
 
     return this.player;
   }
