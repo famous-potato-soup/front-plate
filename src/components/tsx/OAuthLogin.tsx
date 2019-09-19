@@ -35,10 +35,10 @@ const LoginComponent = () => {
       r.json().then(user => {
         if (token) {
           console.log(user, token);
-          setCookie('user', response);
         }
       });
     });
+    setCookie('user', response);
   };
   return (
     <LoginComponents className="LoginComponent">
