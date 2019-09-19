@@ -1,3 +1,4 @@
+// TODO game 오브젝트 destory할 때 window.onresize도 같이 해제해주세요!
 import Phaser from 'phaser';
 
 const MARGIN_OF_MAP = 0;
@@ -8,6 +9,9 @@ const FRICTION_AIR = 0.08;
 const BOUND_RATE = 2;
 
 const DRAG_LINE_COLOR = 0x000000;
+
+const MINIMAP_MARGIN = 50;
+const MINIMAP_SIZE = 300;
 
 export interface GameBoardOptions {
   autoFocus: boolean;
@@ -24,6 +28,9 @@ class GameBoard {
   public game?: Phaser.Game;
   private graphics?: Phaser.GameObjects.Graphics;
   private player?: Phaser.Physics.Matter.Image;
+
+  private minimap?: Phaser.Cameras.Scene2D.Camera;
+  private isDragging: boolean = false;
 
   constructor(options: GameBoardOptions) {
     this.options = options;
@@ -61,6 +68,7 @@ class GameBoard {
           setPlayer: this.setPlayer,
           addDragEventListener: this.addDragEventListener,
           createPlayer: this.createPlayer,
+          calculateWindowSize: this.calculateWindowSize,
         },
       },
     });
@@ -84,7 +92,6 @@ class GameBoard {
     const scene: Phaser.Scene = (this as any) as Phaser.Scene;
 
     this.setWorldBoundsAndCamera(scene);
-
     this.setBackgrounds(scene);
     this.drawBackgroundBorder(scene);
     this.setPlayer(scene);
@@ -100,6 +107,47 @@ class GameBoard {
   setWorldBoundsAndCamera(scene: Phaser.Scene) {
     scene.matter.world.setBounds();
     scene.cameras.main.setZoom(ZOOME_LEVEL_OF_CAMERA);
+
+    this.minimap = scene.cameras.add(0, 0, MINIMAP_SIZE, MINIMAP_SIZE);
+    this.minimap.setZoom(0.2).setName('mini');
+    this.minimap.setBounds(0, 0, 1000, 1000);
+    this.minimap.setBackgroundColor(0xffffff);
+
+    this.calculateWindowSize(scene);
+  }
+
+  calculateWindowSize(scene: Phaser.Scene) {
+    const actualWidth = window.innerWidth;
+    const actualHeight = window.innerHeight;
+
+    const canvasWidth = scene.scale.canvas.width;
+    const canvasHeight = scene.scale.canvas.height;
+
+    const canvasRatio = canvasWidth / canvasHeight;
+    const windowRatio = actualWidth / actualHeight;
+
+    if (this.minimap) {
+      if (windowRatio > canvasRatio) {
+        // 실제 캔버스 비율보다 윈도우 비율이 폭이 길 때
+        // 그럼 높이를 신경써야 함
+        const visibleCanvasHeight = canvasWidth / windowRatio;
+        this.minimap.setPosition(
+          canvasWidth - MINIMAP_SIZE - MINIMAP_MARGIN,
+          canvasHeight - MINIMAP_SIZE - MINIMAP_MARGIN - (canvasHeight - visibleCanvasHeight) / 2,
+        );
+      } else if (windowRatio < canvasRatio) {
+        const visibleCanvasWidth = canvasHeight * windowRatio;
+        this.minimap.setPosition(
+          canvasWidth - MINIMAP_SIZE - MINIMAP_MARGIN - (canvasWidth - visibleCanvasWidth) / 2,
+          canvasHeight - MINIMAP_SIZE - MINIMAP_MARGIN,
+        );
+      } else {
+        this.minimap.setPosition(
+          canvasWidth - MINIMAP_SIZE - MINIMAP_MARGIN,
+          canvasHeight - MINIMAP_SIZE - MINIMAP_MARGIN,
+        );
+      }
+    }
   }
 
   setBackgrounds(scene: Phaser.Scene) {
@@ -131,6 +179,8 @@ class GameBoard {
     this.player = this.createPlayer(scene, 100, 100);
     scene.cameras.main.startFollow(this.player, true);
 
+    this.createPlayer(scene, 300, 300);
+
     return this.player;
   }
 
@@ -147,22 +197,28 @@ class GameBoard {
   addDragEventListener(scene: Phaser.Scene) {
     const draggingIndicator = new Phaser.Geom.Line();
     const draggingGraphics = scene.add.graphics();
+    this.isDragging = false;
 
     scene.input.on('pointerdown', (pointer: Phaser.Input.Pointer) => {
-      draggingGraphics.clear();
-      draggingGraphics.lineStyle(1, DRAG_LINE_COLOR, 1);
+      if (
+        this.player &&
+        pointer.worldX > this.player.x - 25 &&
+        pointer.worldX < this.player.x + 25 &&
+        pointer.worldY > this.player.y - 25 &&
+        pointer.worldY < this.player.y + 25
+      ) {
+        this.isDragging = true;
+        draggingGraphics.clear();
+        draggingGraphics.lineStyle(1, DRAG_LINE_COLOR, 1);
 
-      if (this.player) {
         draggingIndicator.setTo(this.player.x, this.player.y, pointer.worldX, pointer.worldY);
+        draggingGraphics.strokeLineShape(draggingIndicator);
       }
-
-      draggingGraphics.strokeLineShape(draggingIndicator);
     });
 
     scene.input.on('pointermove', (pointer: Phaser.Input.Pointer) => {
-      if (pointer.isDown) {
-        draggingIndicator.x2 = pointer.worldX;
-        draggingIndicator.y2 = pointer.worldY;
+      if (pointer.isDown && this.isDragging && this.player) {
+        draggingIndicator.setTo(this.player.x, this.player.y, pointer.worldX, pointer.worldY);
 
         draggingGraphics.clear();
         draggingGraphics.lineStyle(1, DRAG_LINE_COLOR, 1);
@@ -171,11 +227,12 @@ class GameBoard {
     });
 
     scene.input.on('pointerup', (_: any, gameObject: Phaser.Physics.Arcade.Image) => {
-      draggingGraphics.clear();
-      const velocityX = draggingIndicator.x1 - draggingIndicator.x2;
-      const velocityY = draggingIndicator.y1 - draggingIndicator.y2;
+      if (this.player && this.isDragging) {
+        this.isDragging = false;
+        draggingGraphics.clear();
+        const velocityX = draggingIndicator.x1 - draggingIndicator.x2;
+        const velocityY = draggingIndicator.y1 - draggingIndicator.y2;
 
-      if (this.player) {
         this.player.setVelocity(velocityX * VELOCITY_FACTOR, velocityY * VELOCITY_FACTOR);
       }
     });
