@@ -23,6 +23,10 @@ const Info = styled.div`
   z-index: 3;
 `;
 
+const NumInputDescription = styled.div`
+  font-size: 20px;
+`;
+
 export interface ReadyComponentProps {
   onGameStart: () => void;
 }
@@ -30,6 +34,7 @@ export interface ReadyComponentProps {
 const ReadyComponent: React.FC<ReadyComponentProps> = ({ onGameStart }) => {
   const [cookie, removeCookie] = useCookies(["user"]);
   const [fakeUI, setFakeUI] = useState<boolean>(false);
+  const [numPlayers, setnumPlayers] = useState<integer>(2);
   const removeUserCookie = () => {
     removeCookie("user", "");
   };
@@ -51,7 +56,14 @@ const ReadyComponent: React.FC<ReadyComponentProps> = ({ onGameStart }) => {
   const handleGameStart = () => {
     const data = {};
     Socket.emit("gameStart", data);
+    Socket.emit("numPlayers", numPlayers);
   };
+
+  const updateNumPlayers = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.value){
+      setnumPlayers(parseInt(e.target.value));
+    }
+  }
 
   return fakeUI ? (
     <h1>loading...</h1>
@@ -73,6 +85,12 @@ const ReadyComponent: React.FC<ReadyComponentProps> = ({ onGameStart }) => {
         <div className="infoContent secondInfo">
           <div className="rank info">
             <h2>rank</h2>
+          </div>
+          <div className="numPlayers info">
+            <NumInputDescription>
+              <span>Please input the number of players: </span>
+            </NumInputDescription>
+            <input name="numberofPlayers" type="text" value={numPlayers} min="0" onChange={updateNumPlayers}/>
           </div>
           <div className="start_wrap info">
             <button className="GameStart-btn" onClick={handleGameStart}>
