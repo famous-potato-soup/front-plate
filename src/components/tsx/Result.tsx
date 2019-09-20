@@ -1,10 +1,10 @@
-import React from 'react';
-import styled from 'styled-components';
+import React from "react";
+import styled from "styled-components";
 
-import thumb from '../../assets/img-win.png';
-import loseImg from '../../assets/loseImg.png';
+import thumb from "../../assets/img-win.png";
+import loseImg from "../../assets/loseImg.png";
 
-const Result_wrap = styled.div`
+const ResultWrap = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -14,25 +14,25 @@ const Result_wrap = styled.div`
 
 const WinComponent: React.FC = () => {
   return (
-    <Result_wrap>
+    <ResultWrap>
       <h1>Winner</h1>
       <h2>Name</h2>
       <div className="img_wrap">
         <img src={thumb} alt="thumb" />
       </div>
-    </Result_wrap>
+    </ResultWrap>
   );
 };
 
 const LoseComponent: React.FC = () => {
   return (
-    <Result_wrap>
+    <ResultWrap>
       <h1>Lose</h1>
       <h2>Name</h2>
       <div className="img_wrap">
         <img src={loseImg} alt="thumb" />
       </div>
-    </Result_wrap>
+    </ResultWrap>
   );
 };
 

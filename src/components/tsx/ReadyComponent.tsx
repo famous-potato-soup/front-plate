@@ -1,12 +1,17 @@
-import React from 'react';
-import { useCookies } from 'react-cookie';
-import styled from 'styled-components';
-import SocketClient from '../ts/Socket';
+import React, { useState } from "react";
+import { useCookies } from "react-cookie";
+import styled from "styled-components";
+import { SocketClient, Socket } from "../ts/Socket";
+import socketio from "socket.io-client";
 
-import stone from '../../assets/oval.png';
-import thumb from '../../assets/img-win.png';
+import stone from "../../assets/oval.png";
+import thumb from "../../assets/img-win.png";
 
-const Thumb_wrap = styled.div`
+const { REACT_APP_SOCKET_URL } = process.env;
+
+let SocketNameSpace; // 게임 관련 코드
+
+const ThumbWrap = styled.div`
   position: fixed;
   z-index: 2;
   bottom: 0;
@@ -23,20 +28,35 @@ export interface ReadyComponentProps {
 }
 
 const ReadyComponent: React.FC<ReadyComponentProps> = ({ onGameStart }) => {
-  const [cookie, removeCookie] = useCookies(['user']);
+  const [cookie, removeCookie] = useCookies(["user"]);
+  const [fakeUI, setFakeUI] = useState<boolean>(false);
   const removeUserCookie = () => {
-    removeCookie('user', '');
+    removeCookie("user", "");
   };
   if (cookie.user) {
     SocketClient(cookie);
   }
 
-  const handleGameStart = () => {
+  Socket.on("room", obj => {
+    console.log(obj);
+    SocketNameSpace = socketio.connect(`${REACT_APP_SOCKET_URL}${obj.id}`);
+    setFakeUI(true);
     onGameStart();
+    // SocketNameSpace.on("gameReady", obj => {
+    //   onGameStart();
+    //   console.log(obj);
+    // });
+  });
+
+  const handleGameStart = () => {
+    const data = {};
+    Socket.emit("gameStart", data);
   };
 
-  return (
-    <div className="Info_wrap">
+  return fakeUI ? (
+    <h1>loading...</h1>
+  ) : (
+    <div id="loading" className="Info_wrap">
       <Info>
         <div className="infoContent firstInfo">
           <div className="stoneInfo info">
@@ -44,7 +64,7 @@ const ReadyComponent: React.FC<ReadyComponentProps> = ({ onGameStart }) => {
           </div>
           <div className="myInfo info">
             <div className="user-img">
-              <img src={cookie.user.picture.data.url} />
+              <img src={cookie.user.picture.data.url} alt="userpicture" />
             </div>
             <p className="user_name"> {cookie.user.name}</p>
             <p>{cookie.user.email}</p>
@@ -66,11 +86,11 @@ const ReadyComponent: React.FC<ReadyComponentProps> = ({ onGameStart }) => {
           </button>
         </div>
       </Info>
-      <Thumb_wrap>
+      <ThumbWrap>
         <img src={thumb} alt="thumb_img" />
-      </Thumb_wrap>
+      </ThumbWrap>
     </div>
   );
 };
 
-export default ReadyComponent;
+export { ReadyComponent, SocketNameSpace };

@@ -1,4 +1,5 @@
-import socketio from 'socket.io-client';
+import socketio from "socket.io-client";
+import { useCookies } from "react-cookie";
 
 const { REACT_APP_SOCKET_URL } = process.env;
 
@@ -8,11 +9,24 @@ const Socket = socketio.connect(`${REACT_APP_SOCKET_URL}`);
 // const { Provider, Consumer } = React.createContext(defaultValue);
 
 const SocketClient = props => {
-  Socket.on('gameStart', roomData => console.log(roomData));
-  Socket.on('shoot', data => console.log(data)); // 누가 쏴서 어디로 움직이는지 알기 위해서
+  const [cookie] = useCookies(["user"]);
+  Socket.on("hello", obj => {
+    const userData = {
+      name: cookie.user.name,
+      email: cookie.user.email,
+      userID: cookie.user.id,
+      picture: cookie.user.picture.data.url
+    };
+    Socket.emit("userLogin", userData);
+    Socket.on("userLogin", obj => console.log(obj));
+  });
+  // 1. user가 로그인을 하고 서버에 정보를 emit
+
+  Socket.on("gameStart", roomData => console.log(roomData));
+  Socket.on("shoot", data => console.log(data)); // 누가 쏴서 어디로 움직이는지 알기 위해서
   Socket.on(
-    'moveEnd',
-    data => console.log(data),
+    "moveEnd",
+    data => console.log(data)
     // const moveEndData = {
     //   tile,
     //   player: [
@@ -24,7 +38,7 @@ const SocketClient = props => {
     //   }
     // }
   ); // 초를 막기 위해서 game끝나는 것 확인하기.
-  Socket.on('canShoot', data => console.log); // 중간에 악용하는 애들을 막기 위해서...
+  Socket.on("canShoot", data => console.log); // 중간에 악용하는 애들을 막기 위해서...
   interface stonePush {
     stoneId: number;
     actor: string;
@@ -32,77 +46,13 @@ const SocketClient = props => {
     power: number;
     currentPostion: Array<number>;
   }
-  // user가 로그인을 하고 서버에 정보를 emit
-  const userData = {
-    name: props.user.name,
-    email: props.user.email,
-    userID: props.user.id,
-    picture: props.user.picture.data.url,
-  };
-  Socket.emit('userLogin', userData);
+
   // 이름, 이메일, userID, picture url
 
   // 2. 입장하기를 눌렀을 때 현재의 게임룸 상태를 받아오기
   // 현재 방이 열려있는지, 혹은 시작한 상태인지, 새로 만들어야 되는 상태인지
 
-  const gameRoomStateData = {
-    id: 'uuid_strings', // uuid string, same as unique url
-    status: 'started', // enum value, [waiting, started, done]
-    mode: {
-      // judge win or loose, judging in backend
-      id: 1,
-      size: 2, // for player limit
-      name: 'classic push stone - 1vs 1',
-      isTurn: true, // turn base, e.g. my turn -> your turn -> my turn, false mean is realtime
-      turnLimit: 3000, // turn limit time, 0 is unlimit
-      actionDuration: 500, // time limit for after action
-      moveLimit: 0, // move limit per game, 0 is unlimit
-    },
-    user: {
-      player: [
-        // <player>, // has level, ability, game history(win, loose)
-        {
-          id: 'uuid',
-          name: 'nameeee',
-          won: 33,
-          loose: 67,
-          weight: 1, // play order, highest weight move first
-          stones: [
-            {
-              id: 'uuid',
-              position: {
-                lat: 3.3,
-                lon: 3.3,
-              },
-            },
-          ],
-        },
-      ],
-      observer: [
-        // <user>,
-        {
-          id: 'uuid',
-          name: 'nameeee',
-          won: 33,
-          loose: 67,
-        },
-      ],
-    },
-    tile: {
-      width: 1000,
-      height: 1000,
-    },
-    // events(push, crush), join, leave.... per game room
-    history: [
-      //<event>,
-      {
-        type: 'join_room', // define event types
-        actor: '<player_id>',
-      },
-    ],
-  };
-
-  Socket.on('gameRoomState', function(obj: any): void {
+  Socket.on("gameRoomState", function(obj: any): void {
     console.log(obj);
     // 3. 그 다음 어떻게 행동해야될지 if문을 통해 emit 해주기
 
@@ -131,30 +81,30 @@ const SocketClient = props => {
   //  => 정보를 가지고 퉁치자.
 
   // 5. gameRoomInfo가 오면 경기장으로 입장 + 입장할 때의 돌의 랜덤 위치도 받아와야 할듯하다.
-  Socket.on('gameRoomInfo', function(obj: any): void {
+  Socket.on("gameRoomInfo", function(obj: any): void {
     console.log(obj);
     // 하트비트처럼 사용할 듯
   });
 
   // 6. pushStone.
   const pushStoneData = {
-    id: 'uuid',
-    owner: 'player_id',
+    id: "uuid",
+    owner: "player_id",
     position: {
       lat: 3.3,
-      lon: 10,
+      lon: 10
     },
     action: {
       power: 33,
-      degree: 90,
-    },
+      degree: 90
+    }
   };
   // Socket.emit("pushStone", function(obj: any): void {
   //   console.log(obj);
   // });
 
   // 7. game이 끝나는 이벤트.
-  Socket.on('finishGame', function(obj: any): void {
+  Socket.on("finishGame", function(obj: any): void {
     console.log(obj);
     // 소켓을 안끊어도 괜찮을 지..
   });
@@ -164,4 +114,4 @@ const SocketClient = props => {
   // 2. 게임이 끝나고 소켓연결 해지하는가
 };
 
-export default SocketClient;
+export { SocketClient, Socket };
