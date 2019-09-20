@@ -1,7 +1,6 @@
 import Phaser from "phaser";
 
 import { SocketNameSpace } from "../components/tsx/ReadyComponent";
-import { isNullLiteralTypeAnnotation } from "@babel/types";
 
 const MARGIN_OF_MAP = 0;
 const MARGIN_OF_BORDER = 0;
@@ -11,7 +10,6 @@ const FRICTION_AIR = 0.08;
 const BOUND_RATE = 2;
 
 const DRAG_LINE_COLOR = 0x000000;
-let hello = [];
 
 export interface GameBoardOptions {
   autoFocus: boolean;
@@ -111,36 +109,52 @@ class GameBoard {
     SocketNameSpace.on("shoot", data => {
       // TODO: data 에서 쏜 돌을 찾앙되는데.....abs
       // otherplayer .
-      console.log(this.otherPlayers);
-      console.log(data);
 
-      console.log(email);
-      this.otherPlayers.forEach(x => console.log(x.email));
-      console.log(data.actorEmail);
-      this.otherPlayers
-        .filter(x => x.email != data.actorEmail)
-        .filter(x => data.actorEmail == x.email)
-        .forEach(x => {
-          // x == other.player
-          debugger;
-          // x.setVelocity(x.x, x.y);
-        });
+      console.log("client stored :" + email);
+      console.log("received :" + data.actorEmail);
+      console.log(data);
+      console.log(this.otherPlayers);
+
+      if (data.actorEmail !== email) {
+        this.otherPlayers[0].setVelocity(data.velocity.x, data.velocity.y);
+      }
+
+      // this.otherPlayers
+      //   .filter(player => player.extra.email === data.actorEmail)
+      //   .forEach(x => {
+      //     console.log("--------");
+      //     console.log(x);
+      //     if (data.actorEmail !== email) {
+      //       x.setVelocity(x.velocity.x, x.velocity.y);
+      //     }
+      //     // x == other.player
+      //     // x.setVelocity(x.x, x.y);
+      //   });
     });
 
     SocketNameSpace.on("gameReady", obj => {
       console.log(obj);
-      this.otherPlayers = obj.user;
-      this.otherPlayers.forEach(item => {
+      console.log("gameReady");
+      obj.user.forEach(item => {
         console.log("myInfo", cookieData);
         if (item.email === email) {
           this.player!.setPosition(item.stones[0].x, item.stones[0].y);
         } else {
-          this.createPlayer(scene, item.stones[0].x, item.stones[0].y);
+          const p = this.createPlayer(
+            scene,
+            item.stones[0].x,
+            item.stones[0].y
+          );
+          p["extra"] = item;
+          this.otherPlayers.push(p);
         }
         // document.getElementById('id').css("display", "hidden")
       });
     });
-    SocketNameSpace.on("roomjoined", obj => console.log(obj));
+    SocketNameSpace.on("roomjoined", obj => {
+      console.log(obj);
+      console.log("roomjoined!");
+    });
     // SocketNameSpace.on("canShoot", obj => console.log(obj));
 
     scene.matter.world.on("collisionstart", (event: any) => {
@@ -283,7 +297,10 @@ class GameBoard {
 
           SocketNameSpace.emit("shoot", {
             actorEmail: email,
-            velocity: shootData
+            velocity: {
+              x: velocityX * VELOCITY_FACTOR,
+              y: velocityY * VELOCITY_FACTOR
+            }
           });
 
           this.player.setVelocity(

@@ -87,18 +87,7 @@ const SocketClient = props => {
   });
 
   // 6. pushStone.
-  const pushStoneData = {
-    id: "uuid",
-    owner: "player_id",
-    position: {
-      lat: 3.3,
-      lon: 10
-    },
-    action: {
-      power: 33,
-      degree: 90
-    }
-  };
+
   // Socket.emit("pushStone", function(obj: any): void {
   //   console.log(obj);
   // });
