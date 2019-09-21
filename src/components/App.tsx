@@ -1,17 +1,17 @@
-import React, { useState } from "react";
-import "./App.css";
+import React, { useState } from 'react';
+import './App.css';
 
-import { withCookies, useCookies } from "react-cookie";
+import { withCookies, useCookies } from 'react-cookie';
 
-import LoginComponent from "./tsx/OAuthLogin";
-import { ReadyComponent } from "./tsx/ReadyComponent";
-import { Board } from "./board";
+import LoginComponent from './tsx/OAuthLogin';
+import { ReadyComponent } from './tsx/ReadyComponent';
+import { Board } from './board';
 
-import { WinComponent, LoseComponent } from "./tsx/Result";
+import { WinComponent, LoseComponent } from './tsx/Result';
 
 const App: React.FC = () => {
   const [isGaming, setIsGaming] = useState<boolean>(false);
-  const [cookie] = useCookies(["user"]);
+  const [cookie] = useCookies(['user']);
 
   const handleGameStart = () => {
     setIsGaming(true);
@@ -31,8 +31,8 @@ const App: React.FC = () => {
         ) : (
           <LoseComponent />
         )}
+        {/* <WinComponent /> */}
       </div>
-      {/* <WinComponent /> */}
     </div>
   );
 };

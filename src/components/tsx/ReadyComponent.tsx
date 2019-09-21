@@ -1,11 +1,11 @@
-import React, { useState } from "react";
-import { useCookies } from "react-cookie";
-import styled from "styled-components";
-import { SocketClient, Socket } from "../ts/Socket";
-import socketio from "socket.io-client";
+import React, { useState } from 'react';
+import { useCookies } from 'react-cookie';
+import styled from 'styled-components';
+import { SocketClient, Socket } from '../ts/Socket';
+import socketio from 'socket.io-client';
 
-import stone from "../../assets/oval.png";
-import thumb from "../../assets/img-win.png";
+import stone from '../../assets/oval.png';
+import thumb from '../../assets/img-win.png';
 
 const { REACT_APP_SOCKET_URL } = process.env;
 
@@ -28,16 +28,16 @@ export interface ReadyComponentProps {
 }
 
 const ReadyComponent: React.FC<ReadyComponentProps> = ({ onGameStart }) => {
-  const [cookie, removeCookie] = useCookies(["user"]);
+  const [cookie, removeCookie] = useCookies(['user']);
   const [fakeUI, setFakeUI] = useState<boolean>(false);
   const removeUserCookie = () => {
-    removeCookie("user", "");
+    removeCookie('user', '');
   };
   if (cookie.user) {
     SocketClient(cookie);
   }
 
-  Socket.on("room", obj => {
+  Socket.on('room', obj => {
     console.log(obj);
     SocketNameSpace = socketio.connect(`${REACT_APP_SOCKET_URL}${obj.id}`);
     setFakeUI(true);
@@ -50,7 +50,7 @@ const ReadyComponent: React.FC<ReadyComponentProps> = ({ onGameStart }) => {
 
   const handleGameStart = () => {
     const data = {};
-    Socket.emit("gameStart", data);
+    Socket.emit('gameStart', data);
   };
 
   return fakeUI ? (

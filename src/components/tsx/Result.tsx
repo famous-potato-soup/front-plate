@@ -1,8 +1,8 @@
-import React from "react";
-import styled from "styled-components";
+import React from 'react';
+import styled from 'styled-components';
 
-import thumb from "../../assets/img-win.png";
-import loseImg from "../../assets/loseImg.png";
+import thumb from '../../assets/img-win.png';
+import loseImg from '../../assets/loseImg.png';
 
 const ResultWrap = styled.div`
   display: flex;
@@ -12,23 +12,25 @@ const ResultWrap = styled.div`
   height: 100%;
 `;
 
-const WinComponent: React.FC = () => {
-  return (
-    <ResultWrap>
-      <h1>Winner</h1>
-      <h2>Name</h2>
-      <div className="img_wrap">
-        <img src={thumb} alt="thumb" />
-      </div>
-    </ResultWrap>
-  );
-};
+class WinComponent extends React.Component {
+  render() {
+    return (
+      <ResultWrap>
+        <h1>Winner</h1>
+        <h2>emygmbnkcp_1568904093@tfbnw.net</h2>
+        <div className="img_wrap">
+          <img src={thumb} alt="thumb" />
+        </div>
+      </ResultWrap>
+    );
+  }
+}
 
-const LoseComponent: React.FC = () => {
+const LoseComponent: React.FC = props => {
   return (
     <ResultWrap>
       <h1>Lose</h1>
-      <h2>Name</h2>
+      <h2>ddkcnufhpj_1568913423@tfbnw.net</h2>
       <div className="img_wrap">
         <img src={loseImg} alt="thumb" />
       </div>

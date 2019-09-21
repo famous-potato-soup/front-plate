@@ -1,5 +1,5 @@
-import socketio from "socket.io-client";
-import { useCookies } from "react-cookie";
+import socketio from 'socket.io-client';
+import { useCookies } from 'react-cookie';
 
 const { REACT_APP_SOCKET_URL } = process.env;
 
@@ -9,24 +9,24 @@ const Socket = socketio.connect(`${REACT_APP_SOCKET_URL}`);
 // const { Provider, Consumer } = React.createContext(defaultValue);
 
 const SocketClient = props => {
-  const [cookie] = useCookies(["user"]);
-  Socket.on("hello", obj => {
+  const [cookie] = useCookies(['user']);
+  Socket.on('hello', obj => {
     const userData = {
       name: cookie.user.name,
       email: cookie.user.email,
       userID: cookie.user.id,
-      picture: cookie.user.picture.data.url
+      picture: cookie.user.picture.data.url,
     };
-    Socket.emit("userLogin", userData);
-    Socket.on("userLogin", obj => console.log(obj));
+    Socket.emit('userLogin', userData);
+    Socket.on('userLogin', obj => console.log(obj));
   });
   // 1. user가 로그인을 하고 서버에 정보를 emit
 
-  Socket.on("gameStart", roomData => console.log(roomData));
-  Socket.on("shoot", data => console.log(data)); // 누가 쏴서 어디로 움직이는지 알기 위해서
+  Socket.on('gameStart', roomData => console.log(roomData));
+  Socket.on('shoot', data => console.log(data)); // 누가 쏴서 어디로 움직이는지 알기 위해서
   Socket.on(
-    "moveEnd",
-    data => console.log(data)
+    'moveEnd',
+    data => console.log(data),
     // const moveEndData = {
     //   tile,
     //   player: [
@@ -38,7 +38,7 @@ const SocketClient = props => {
     //   }
     // }
   ); // 초를 막기 위해서 game끝나는 것 확인하기.
-  Socket.on("canShoot", data => console.log); // 중간에 악용하는 애들을 막기 위해서...
+  Socket.on('canShoot', data => console.log); // 중간에 악용하는 애들을 막기 위해서...
   interface stonePush {
     stoneId: number;
     actor: string;
@@ -52,7 +52,7 @@ const SocketClient = props => {
   // 2. 입장하기를 눌렀을 때 현재의 게임룸 상태를 받아오기
   // 현재 방이 열려있는지, 혹은 시작한 상태인지, 새로 만들어야 되는 상태인지
 
-  Socket.on("gameRoomState", function(obj: any): void {
+  Socket.on('gameRoomState', function(obj: any): void {
     console.log(obj);
     // 3. 그 다음 어떻게 행동해야될지 if문을 통해 emit 해주기
 
@@ -81,7 +81,7 @@ const SocketClient = props => {
   //  => 정보를 가지고 퉁치자.
 
   // 5. gameRoomInfo가 오면 경기장으로 입장 + 입장할 때의 돌의 랜덤 위치도 받아와야 할듯하다.
-  Socket.on("gameRoomInfo", function(obj: any): void {
+  Socket.on('gameRoomInfo', function(obj: any): void {
     console.log(obj);
     // 하트비트처럼 사용할 듯
   });
@@ -93,7 +93,7 @@ const SocketClient = props => {
   // });
 
   // 7. game이 끝나는 이벤트.
-  Socket.on("finishGame", function(obj: any): void {
+  Socket.on('finishGame', function(obj: any): void {
     console.log(obj);
     // 소켓을 안끊어도 괜찮을 지..
   });
